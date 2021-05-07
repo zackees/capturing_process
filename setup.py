@@ -13,7 +13,7 @@ URL = 'https://github.com/zackees/capturing_process'
 EMAIL = 'dont@email.me'
 AUTHOR = 'Zach Vorhies'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '1.0.3'
+VERSION = '1.0.4'
 
 # The text of the README file
 with open(os.path.join(HERE, "README.md")) as fd:
@@ -75,8 +75,6 @@ setup(
     ],
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     include_package_data=True,
-    install_requires=[],
-    setup_requires=['wheel', 'tox', 'twine'],
     extras_require={},
     cmdclass={
         'upload': UploadCommand,

@@ -27,6 +27,7 @@ class _StreamThread(threading.Thread):
         self.in_stream = in_stream
         self.out_stream = out_stream
         self.buffer = StringIO()
+        self.buffer_read_position = 0
         self.buffer_lock: threading.Lock = threading.Lock()
         self.start()
 
@@ -35,22 +36,28 @@ class _StreamThread(threading.Thread):
             for line in iter(self.in_stream.readline, ""):
                 with self.buffer_lock:
                     self.buffer.write(line)
-                if self.out_stream:
-                    self.out_stream.write(line)
         except KeyboardInterrupt:
             return
+
+    def pump(self) -> None:
+        """
+        Pumps the supplied out_stream from the calling thread. Data
+        is merged from this stream thread output process.
+        """
+        with self.buffer_lock:
+            out = self.buffer.getvalue()
+        if self.buffer_read_position == len(out):
+            return
+        out = out[self.buffer_read_position :]
+        self.buffer_read_position = len(out)
+        if self.out_stream:
+            self.out_stream.write(out)
 
     def join_once(self) -> Any:
         """Like join() but safe for multiple calls."""
         if not self.dead:
             self.dead = True
             self.join()
-
-    def read(self) -> str:
-        """Reads the current buffer stream."""
-        with self.buffer_lock:
-            out = self.buffer.read()
-        return out
 
     def to_string(self) -> str:
         """Converts the whole buffer into a string."""
@@ -121,6 +128,8 @@ class CapturingProcess:
             if self.rtn_code is not None:
                 self.stdout_thread.join_once()
                 self.stderr_thread.join_once()
+            self.stdout_thread.pump()
+            self.stderr_thread.pump()
         return self.rtn_code
 
     def kill(self) -> None:
