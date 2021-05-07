@@ -1,1 +1,5 @@
-__version__ = "1.0.0"
+"""
+  Bring CapturingProcess into the main namespace.
+"""
+
+from capturing_process.capturing_process import CapturingProcess
