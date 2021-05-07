@@ -7,15 +7,13 @@ from setuptools import find_packages, setup, Command
 # The directory containing this file
 HERE = os.path.dirname(__file__)
 
-
 NAME = 'capturing_process'
-
 DESCRIPTION = 'Captures stderr/stdout as a stream to allow easy log monitoring of long running shell processes.",'
 URL = 'https://github.com/zackees/capturing_process'
 EMAIL = 'dont@email.me'
 AUTHOR = 'Zach Vorhies'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '1.0.1'
+VERSION = '1.0.3'
 
 # The text of the README file
 with open(os.path.join(HERE, "README.md")) as fd:
@@ -78,7 +76,7 @@ setup(
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     include_package_data=True,
     install_requires=[],
-
+    setup_requires=['wheel', 'tox', 'twine'],
     extras_require={},
     cmdclass={
         'upload': UploadCommand,
