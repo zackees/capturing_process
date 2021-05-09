@@ -17,6 +17,7 @@ class FakeStream:
     def get(self) -> str:
         return "".join(self.buff)
 
+
 class ProcessTester(unittest.TestCase):
     def test_capture_stdout(self):
         out_stream = StringIO()

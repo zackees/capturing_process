@@ -49,7 +49,7 @@ class _StreamThread(threading.Thread):
         if self.buffer_read_position == len(out):
             return
         out = out[self.buffer_read_position :]
-        self.buffer_read_position = len(out)
+        self.buffer_read_position += len(out)
         if self.out_stream:
             self.out_stream.write(out)
 
