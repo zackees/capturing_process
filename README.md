@@ -52,6 +52,12 @@ proc = CapturingProcess("echo hi", stdout=StringIO())
 proc.wait()  # stdout redirected to StringIO()
 ```
 
+## If you want the entire stdout/stderr bytes
+
+```
+proc.get_stdout()
+proc.get_stderr()
+```
 
 # Python version: 3.6+
 
