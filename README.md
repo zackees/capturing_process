@@ -13,6 +13,8 @@ be string, not an array like what is accepted by subprocess.Popen().
 Super simple example:
 
 ```
+from capturing_process import CapturingProcess
+
 out_stream = StringIO()
 p = CapturingProcess("echo hi", stdout=out_stream)
 p.wait()
