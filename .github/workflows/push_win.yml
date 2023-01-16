@@ -28,9 +28,6 @@ jobs:
         path: ./.downloads
         key: install-${{ hashFiles('.downloads') }}
         restore-keys: install-
-    - name: check prerun
-      run: python test_install/prerun.py
-
     - name: Install dependencies
       run: |
         pip install -e '.[test]'
