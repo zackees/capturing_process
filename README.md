@@ -1,5 +1,8 @@
 # Finally, a subprocess type that streams out stdout/stderr easily
 
+[![Win_Tests](https://github.com/zackees/capturing_process/actions/workflows/push_win.yml/badge.svg)](https://github.com/zackees/pyflutterinstall/actions/workflows/push_win.yml)
+
+
 Capturing the stderr AND stdout from a process in python is not that easy.
 This class makes this capturing much easier by delegating the line capturing
 to seperate threads. This capture can be totally in memory or can optionally
