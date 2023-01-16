@@ -36,6 +36,8 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -e '.[test]'
+    - name: Install Tox
+      run: pip install tox
     - name: Run Tox
       run: tox
 
