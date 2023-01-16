@@ -12,7 +12,7 @@ be string, not an array like what is accepted by subprocess.Popen().
 
 Super simple example:
 
-```
+```python
 from capturing_process import CapturingProcess
 
 out_stream = StringIO()
@@ -36,7 +36,7 @@ class MyStream:
 
 Then compose:
 
-```
+```python
 with open('myfile', 'w') as fd:
     out_stream = MyStream(fd)
     proc = CapturingProcess("echo hi", stdout=out_stream)
@@ -47,14 +47,14 @@ with open('myfile', 'w') as fd:
 To silence an output stream (stdout/stderr) drop a StringIO object as an argument to
 the CapturingProcess like so:
 
-```
+```python
 proc = CapturingProcess("echo hi", stdout=StringIO())
 proc.wait()  # stdout redirected to StringIO()
 ```
 
 ## If you want the entire stdout/stderr bytes
 
-```
+```python
 proc.get_stdout()
 proc.get_stderr()
 ```
