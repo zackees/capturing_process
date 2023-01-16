@@ -30,9 +30,7 @@ jobs:
         restore-keys: install-
     - name: check prerun
       run: python test_install/prerun.py
-    - name: Set utf-8 Encoding
-      run: |
-        setx PYTHONIOENCODING "utf-8" && setx PYTHONLEGACYWINDOWSSTDIO "utf-8"
+
     - name: Install dependencies
       run: |
         pip install -e '.[test]'
