@@ -9,14 +9,22 @@
   Tested on win32 and macOS and some flavors of linux.
 """
 
+# pylint: disable=import-error,wrong-import-position
+
 import os
 import subprocess
 import sys
 import time
 from typing import Any, Optional
 
+if sys.platform == "win32":
+    from colorama import just_fix_windows_console  # type: ignore
+    import threading
 
 from capturing_process.stream_thread import StreamThread
+
+if sys.platform == "win32":
+    mutex = threading.Lock()
 
 
 class CapturingProcess:
@@ -33,6 +41,9 @@ class CapturingProcess:
         stdout: Any = None,
         stderr: Any = None,
     ):
+        if sys.platform == "win32":
+            with mutex:
+                just_fix_windows_console()
         self.cmd = cmd
         self.rtn_code: Optional[int] = None
         if cwd is None:

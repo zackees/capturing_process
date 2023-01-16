@@ -75,6 +75,9 @@ setup(
     ],
     packages=find_packages(exclude=["tests", "*.tests", "*.tests.*", "tests.*"]),
     include_package_data=True,
+    install_requires=[
+        'colorama; sys_platform == "win32"',     
+    ],
     extras_require={},
     cmdclass={
         'upload': UploadCommand,

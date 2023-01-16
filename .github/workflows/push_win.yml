@@ -1,0 +1,41 @@
+name: Win_Tests
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python-version: [3.10.8]
+        os: [windows-latest]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v3
+      name: Configure pip caching
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - uses: actions/cache@v3
+      name: Install Cache
+      with:
+        path: ./.downloads
+        key: install-${{ hashFiles('.downloads') }}
+        restore-keys: install-
+    - name: check prerun
+      run: python test_install/prerun.py
+    - name: Set utf-8 Encoding
+      run: |
+        setx PYTHONIOENCODING "utf-8" && setx PYTHONLEGACYWINDOWSSTDIO "utf-8"
+    - name: Install dependencies
+      run: |
+        pip install -e '.[test]'
+    - name: Run Tox
+      run: tox
+
