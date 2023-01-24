@@ -28,7 +28,7 @@ self.assertIn("hi", p.get_stdout())
 
 For splitting the output to stdout and a file you'd write a stream class like so:
 
-```
+```python
 class MyStream:
     def __init__(self, filehandle) -> None:
         self.fh = filehandle
@@ -36,11 +36,7 @@ class MyStream:
     def write(self, data: str) -> None:
         self.fh.write(data)
         sys.stdout.write(data)
-```
 
-Then compose:
-
-```python
 with open('myfile', 'w') as fd:
     out_stream = MyStream(fd)
     proc = CapturingProcess("echo hi", stdout=out_stream)
