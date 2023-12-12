@@ -9,6 +9,7 @@ from typing import Any
 # ignore E203
 # flake8: noqa:E203
 
+THREAD_JOIN_TIMEOUT = 5
 
 class StreamThread(threading.Thread):
     """Internal class for streaming subprocess streams to a buffer."""
@@ -49,7 +50,7 @@ class StreamThread(threading.Thread):
         """Like join() but safe for multiple calls."""
         if not self.dead:
             self.dead = True
-            self.join()
+            self.join(timeout=THREAD_JOIN_TIMEOUT)
 
     def to_string(self) -> str:
         """Converts the whole buffer into a string."""
