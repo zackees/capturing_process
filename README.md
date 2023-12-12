@@ -69,3 +69,8 @@ pretty well.
 
    * https://pypi.org/project/capturing-process/
    * https://github.com/zackees/capturing_process
+
+
+# Versions
+
+  * 1.0.8: Fixes CapturingProcess.kill blocking if the stdout and stderr threads fail to join.
