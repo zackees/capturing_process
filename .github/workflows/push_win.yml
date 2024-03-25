@@ -22,16 +22,8 @@ jobs:
         key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
         restore-keys: |
           ${{ runner.os }}-pip-
-    - uses: actions/cache@v3
-      name: Install Cache
-      with:
-        path: ./.downloads
-        key: install-${{ hashFiles('.downloads') }}
-        restore-keys: install-
     - name: Install dependencies
-      run: |
-        pip install -e '.[test]'
-        - name: Install dependencies
+      run: pip install -e '.[test]'
     - name: Run tests
       run: ./test
 
