@@ -4,6 +4,8 @@ Stream for capturing subprocess streams to a buffer.
 
 import ctypes
 import threading
+import traceback
+import warnings
 from typing import Any
 
 # ignore E203
@@ -13,6 +15,8 @@ MAX_BUFFER_SIZE = 1024 * 1024 * 1  # 1MB
 
 
 def _async_raise(tid, excobj):
+    """Raises an exception in the threads with id, tid"""
+    warnings.warn(f"async_raise: {tid}, {excobj}")
     res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(excobj))
     if res == 0:
         raise ValueError("nonexistent thread id")
@@ -45,6 +49,9 @@ class StreamThread(threading.Thread):
                     self.buffer += line
         except KeyboardInterrupt:
             return
+        except Exception as exc:  # pylint: disable=broad-except
+            stacktrace = traceback.format_exc()
+            warnings.warn(f"StreamThread exception: {exc}, {stacktrace}")
 
     def pump(self, ignore_dead_signal=False) -> None:
         """
