@@ -29,28 +29,25 @@ self.assertIn("hi", p.get_stdout())
 For splitting the output to stdout and a file you'd write a stream class like so:
 
 ```python
+import logging
 class MyStream:
-    def __init__(self, filehandle) -> None:
-        self.fh = filehandle
+    def __init__(self) -> None:
+        pass
 
     def write(self, data: str) -> None:
-        self.fh.write(data)
-        sys.stdout.write(data)
+        logging.info(data.rstrip('\n'))
+        print(data, end="")
 
-with open('myfile', 'w') as fd:
-    out_stream = MyStream(fd)
-    proc = CapturingProcess("echo hi", stdout=out_stream)
-    proc.wait()  # Output will go to file and sys.stdout
+
+out_stream = MyStream()
+proc = CapturingProcess("echo hi", stdout=out_stream)
+proc.wait()  # Output will be captured in logging file and stdout
 ```
 
 
 To silence an output stream (stdout/stderr) drop a StringIO object as an argument to
 the CapturingProcess like so:
 
-```python
-proc = CapturingProcess("echo hi", stdout=StringIO())
-proc.wait()  # stdout redirected to StringIO()
-```
 
 ## If you want the entire stdout/stderr bytes
 
@@ -73,6 +70,5 @@ pretty well.
 
 # Versions
 
-  * 1.0.10: Now takes a max_buffer size.
   * 1.0.9: stdout/stderr threads are now forcefully killed within .1 second if they don't join.
   * 1.0.8: Fixes CapturingProcess.kill blocking if the stdout and stderr threads fail to join.
