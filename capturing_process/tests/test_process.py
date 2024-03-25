@@ -22,11 +22,12 @@ class FakeStream:
 
 class ProcessTester(unittest.TestCase):
     def test_capture_stdout(self):
-        out_stream = StringIO()
-        p = CapturingProcess("echo hi", stdout=out_stream)
-        p.wait()
-        self.assertIn("hi", out_stream.getvalue())
-        self.assertIn("hi", p.get_stdout())
+        # out_stream = StringIO()
+        with StringIO() as out_stream:
+            p = CapturingProcess("echo hi", stdout=out_stream)
+            p.wait()
+            self.assertIn("hi", out_stream.getvalue())
+            self.assertIn("hi", p.get_stdout())
 
     def test_capture_stderr(self):
         fs = FakeStream()
@@ -59,8 +60,6 @@ class ProcessTester(unittest.TestCase):
         p.check_wait()
         p = CapturingProcess(cmd, stdout=FakeStream(), stderr=ThreadStreamChecker())
         p.check_wait()
-        closed = p.stderr_thread.buffer.closed
-        print(closed)
 
 
 if __name__ == "__main__":

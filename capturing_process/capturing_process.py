@@ -21,7 +21,7 @@ if sys.platform == "win32":
     from colorama import just_fix_windows_console  # type: ignore
     import threading
 
-from capturing_process.stream_thread import StreamThread
+from capturing_process.stream_thread import MAX_BUFFER_SIZE, StreamThread
 
 if sys.platform == "win32":
     mutex = threading.Lock()
@@ -40,7 +40,7 @@ class CapturingProcess:
         cwd: Optional[str] = None,
         stdout: Any = None,
         stderr: Any = None,
-
+        max_buffer_size: int = MAX_BUFFER_SIZE,
     ):
         if sys.platform == "win32":
             with mutex:
@@ -60,8 +60,8 @@ class CapturingProcess:
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
         )
-        self.stdout_thread = StreamThread(self.proc.stdout, stdout)
-        self.stderr_thread = StreamThread(self.proc.stderr, stderr)
+        self.stdout_thread = StreamThread(self.proc.stdout, stdout, max_buffer_size)
+        self.stderr_thread = StreamThread(self.proc.stderr, stderr, max_buffer_size)
 
     def wait(self, timeout: Optional[int] = None) -> Optional[int]:
         """Like subprocess.Popen.wait. Plays nice with KeyboardInterrupt."""
@@ -128,8 +128,7 @@ class CapturingProcess:
     def get_stderr(self) -> str:
         """Returns all the stderr as one string."""
         return self.stderr_thread.to_string()
-    
+
     def __del__(self) -> None:
         self.stderr_thread.join_once()
         self.stdout_thread.join_once()
-    

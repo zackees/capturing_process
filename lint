@@ -1,0 +1,18 @@
+#!/bin/bash
+set -e
+# cd to self bash script directory
+cd $( dirname ${BASH_SOURCE[0]})
+. ./activate.sh
+echo Running ruff capturing_process
+ruff --fix capturing_process
+echo Running ruff
+ruff --fix
+echo Running black capturing_process
+black capturing_process
+echo Running isort capturing_process
+isort --profile black capturing_process
+echo Running flake8 capturing_process
+flake8 --max-line-length=200 --ignore=E266 capturing_process
+echo Running mypy capturing_process
+mypy capturing_process
+echo Linting complete!
