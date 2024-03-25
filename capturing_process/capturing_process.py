@@ -59,6 +59,7 @@ class CapturingProcess:
             universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            text=True,
         )
         self.stdout_thread = StreamThread(self.proc.stdout, stdout, max_buffer_size)
         self.stderr_thread = StreamThread(self.proc.stderr, stderr, max_buffer_size)

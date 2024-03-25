@@ -44,9 +44,19 @@ class StreamThread(threading.Thread):
 
     def run(self) -> None:
         try:
-            for line in iter(self.in_stream.readline, ""):
-                with self.buffer_lock:
-                    self.buffer += line
+            iter_lines = iter(self.in_stream.readline, b"")
+            while True:
+                line: str | None = None
+                try:
+                    line = next(iter_lines)
+                    if not line:
+                        break
+                    with self.buffer_lock:
+                        self.buffer += line
+                except Exception as exc:  # pylint: disable=broad-except
+                    stacktrace = traceback.format_exc()
+                    warnings.warn(f"StreamThread exception: {exc}, {stacktrace}")
+                    continue
         except KeyboardInterrupt:
             return
         except Exception as exc:  # pylint: disable=broad-except
