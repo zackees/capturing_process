@@ -55,7 +55,7 @@ class CapturingProcess:
             cmd,
             shell=True,
             cwd=cwd,
-            bufsize=0,
+            bufsize=-1,
             universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
