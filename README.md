@@ -73,5 +73,6 @@ pretty well.
 
 # Versions
 
+  * 1.0.10: Now takes a max_buffer size.
   * 1.0.9: stdout/stderr threads are now forcefully killed within .1 second if they don't join.
   * 1.0.8: Fixes CapturingProcess.kill blocking if the stdout and stderr threads fail to join.
