@@ -59,6 +59,8 @@ class ProcessTester(unittest.TestCase):
         p.check_wait()
         p = CapturingProcess(cmd, stdout=FakeStream(), stderr=ThreadStreamChecker())
         p.check_wait()
+        closed = p.stderr_thread.buffer.closed
+        print(closed)
 
 
 if __name__ == "__main__":

@@ -40,6 +40,7 @@ class CapturingProcess:
         cwd: Optional[str] = None,
         stdout: Any = None,
         stderr: Any = None,
+
     ):
         if sys.platform == "win32":
             with mutex:
@@ -75,6 +76,9 @@ class CapturingProcess:
                 break
             time.sleep(0.1)  # Most friendly to the keyboard interrupt
             # on win32.
+        if self.rtn_code is not None:
+            self.stdout_thread.join_once()
+            self.stderr_thread.join_once()
         return self.rtn_code
 
     def check_wait(self) -> None:
@@ -124,3 +128,8 @@ class CapturingProcess:
     def get_stderr(self) -> str:
         """Returns all the stderr as one string."""
         return self.stderr_thread.to_string()
+    
+    def __del__(self) -> None:
+        self.stderr_thread.join_once()
+        self.stdout_thread.join_once()
+    

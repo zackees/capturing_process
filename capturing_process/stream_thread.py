@@ -10,6 +10,7 @@ import ctypes
 # ignore E203
 # flake8: noqa:E203
 
+MAX_BUFFER_SIZE = 1024 * 1024 * 1  # 1MB
 
 def _async_raise(tid, excobj):
     res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(excobj))
@@ -25,7 +26,7 @@ def _async_raise(tid, excobj):
 class StreamThread(threading.Thread):
     """Internal class for streaming subprocess streams to a buffer."""
 
-    def __init__(self, in_stream: Any, out_stream: Any) -> None:
+    def __init__(self, in_stream: Any, out_stream: Any, buffer_size: int = MAX_BUFFER_SIZE) -> None:
         threading.Thread.__init__(self, daemon=True)
         self.dead = False
         self.in_stream = in_stream
@@ -33,6 +34,8 @@ class StreamThread(threading.Thread):
         self.buffer = StringIO()
         self.buffer_read_position = 0
         self.buffer_lock: threading.Lock = threading.Lock()
+        self.buffer_size = buffer_size
+        self.final_string = ""
         self.start()
 
     def run(self) -> None:
@@ -43,16 +46,31 @@ class StreamThread(threading.Thread):
         except KeyboardInterrupt:
             return
 
-    def pump(self) -> None:
+    def pump(self, ignore_dead_signal = False) -> None:
         """
         Pumps the supplied out_stream from the calling thread. Data
         is merged from this stream thread output process.
         """
         with self.buffer_lock:
-            out = self.buffer.getvalue()
-        if self.buffer_read_position == len(out):
-            return
-        out = out[self.buffer_read_position :]
+            if self.buffer.closed:
+                return
+            if self.dead and not ignore_dead_signal:
+                return
+            full_buffer = self.buffer.getvalue()
+            out = full_buffer[self.buffer_read_position :]
+            if not out:
+                return
+            self.buffer_read_position += len(out)
+            if len(full_buffer) > self.buffer_size:
+                to_remove = len(full_buffer) - self.buffer_size
+                to_remove += int(.25 * self.buffer_size)
+                to_remove = max(0, to_remove)
+                assert to_remove > 0, f"unexpected, to_remove={to_remove} and should be > 0"
+                out = full_buffer[to_remove:]
+                self.buffer.close()
+                self.buffer = StringIO()
+                new_position = self.buffer.write(out)
+                self.buffer_read_position = new_position
         self.buffer_read_position += len(out)
         if self.out_stream:
             self.out_stream.write(out)
@@ -61,7 +79,11 @@ class StreamThread(threading.Thread):
         """Like join() but safe for multiple calls."""
         if not self.dead and self.is_alive():
             try:
-                self.join(timeout=0.1)
+                self.join(timeout=5.0)
+                self.dead = True
+                self.pump(ignore_dead_signal=True)
+                self.final_string = self.to_string()
+                self.buffer.close()
                 return
             except Exception:  # pylint: disable=broad-except
                 try:
@@ -72,6 +94,8 @@ class StreamThread(threading.Thread):
     def to_string(self) -> str:
         """Converts the whole buffer into a string."""
         with self.buffer_lock:
+            if self.buffer.closed:
+                return self.final_string
             out = self.buffer.getvalue()
         return out
 
@@ -88,3 +112,7 @@ class StreamThread(threading.Thread):
         # must raise the SystemExit type, instead of a SystemExit() instance
         # due to a bug in PyThreadState_SetAsyncExc
         self.raise_exc(SystemExit)
+
+    def __del__(self):
+        self.buffer.close()
+
